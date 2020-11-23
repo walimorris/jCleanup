@@ -5,7 +5,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-import java.nio.file.DirectoryIteratorException; 
+import java.nio.file.DirectoryIteratorException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
@@ -21,18 +21,14 @@ public class Main {
         final int DAYS_TO_DELETE = getDaysToDelete(input);
         final Path PATH_TO_DESKTOP = getPathToDirectory(input);
         LocalDate todayDate = LocalDate.now();
-
         Map<String, LocalDate> deletableFiles = streamDeletableFiles(PATH_TO_DESKTOP);
         Map<String, LocalDate> validDeletableFiles = validateDeletableFiles(deletableFiles, DAYS_TO_DELETE, todayDate);
-        for ( String file : deletableFiles.keySet() ) {
-            System.out.print("\n\tFile: " + file);
-            System.out.println("\tDate: " + deletableFiles.get(file) + "\n");
-        }
-
-        System.out.println("Valid deletable files : ");
-        for ( String file : validDeletableFiles.keySet() ) {
-            System.out.print("\n\tFile: " + file);
-            System.out.println("\tDate: " + deletableFiles.get(file) + "\n");
+        boolean continueProcess = confirmFileDeletion(input, validDeletableFiles);
+        if ( continueProcess ) {
+            System.out.println("deleting files!");
+            // delete files
+        } else {
+            System.exit(1);
         }
         input.close();
     }
@@ -98,7 +94,7 @@ public class Main {
                                                                 int daysToDelete, LocalDate todayDate) {
         Map<String, LocalDate> validDeletableFiles = new HashMap<>();
         LocalDate adjustedDate = todayDate.minus(Period.ofDays(daysToDelete));
-        System.out.println("Files on or after date ' " + adjustedDate.toString() + " ' will be deleted.");
+        System.out.println("\tFiles on or after date ' " + adjustedDate.toString() + " ' will be deleted.");
         for ( String file : deletableFiles.keySet() ) {
             if (deletableFiles.get(file).compareTo(adjustedDate) <= 0) {
                 validDeletableFiles.put(file, deletableFiles.get(file));
@@ -113,6 +109,7 @@ public class Main {
      * 2020/11/20.
      * @param input : {@link Scanner}
      * @return : int
+     * @author Wali Morris<walimmorris@gmail.com>
      */
     public static int getDaysToDelete(Scanner input) {
         System.out.print("\tHow far should we go back, in days: ");
@@ -120,15 +117,59 @@ public class Main {
     }
 
     /**
+     * Returns the user's wish to continue a process in the program.
+     * @param input : {@link Scanner} reading user input.
+     * @return : boolean
+     * @author Wali Morris<walimmorris@gmail.com>
+     */
+    public static boolean continueProcess(Scanner input) {
+        System.out.print("\tContinue? (yes / no) - q[quit]: ");
+        boolean flag = false;
+        String continueProcess = input.next();
+        while (!flag) {
+            switch (continueProcess) {
+                case "Yes", "yes", "Y", "y", "No", "no", "N", "n" -> flag = true;
+            }
+            if (!flag) {
+                if ( continueProcess.equals("q") || continueProcess.equals("quit")) {
+                    System.out.println("\tFiles redeemed. Goodbye!");
+                    System.exit(1);
+                }
+                System.out.print("\tPlease choose an option. (yes / no) - q[quit]: ");
+                continueProcess = input.next();
+            }
+        }
+        return continueProcess.equals("Yes") || continueProcess.equals("yes");
+    }
+
+    /**
      * Receives the path to the directory where files will be collected for deletion.
      * The file should be in a Unix-like format. Ex: '/path/to/directory'.
      * @param input : {@link Scanner}
      * @return {@link Path}
+     * @author Wali Morris<walimmorris@gmail.com>
      */
     public static Path getPathToDirectory(Scanner input) {
         System.out.print("\tOkay, Where's your Desktop located (/path/to/desktop): ");
         String path = input.next();
         return Paths.get(path);
+    }
+
+    /**
+     * reports a confirmed list of deletable files to the user and sends a warning.
+     * @param input : {@link Scanner} object for user input.
+     * @param validDeletableFiles : {@link Map} containing valid delatable files within {@link LocalDate}
+     * @return boolean
+     * @author Wali Morris<walimorris@gmail.com>
+     */
+    public static boolean confirmFileDeletion(Scanner input, Map<String, LocalDate> validDeletableFiles) {
+        System.out.println("\n\tValid deletable files : ");
+        for (String file : validDeletableFiles.keySet()) {
+            System.out.print("\tFile: " + file);
+            System.out.println("\tDate: " + validDeletableFiles.get(file));
+        }
+        System.out.println("\n\tWARNING ALL REPORTED FILES WILL BE DELETED!");
+        return continueProcess(input);
     }
 
     /**
