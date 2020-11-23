@@ -1,7 +1,11 @@
 package com.morris.jCleanup;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.DirectoryIteratorException; 
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
@@ -30,6 +34,7 @@ public class Main {
             System.out.print("\n\tFile: " + file);
             System.out.println("\tDate: " + deletableFiles.get(file) + "\n");
         }
+        input.close();
     }
 
     /**
