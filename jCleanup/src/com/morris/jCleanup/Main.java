@@ -15,8 +15,7 @@ public class Main {
         printIntroduction();
         Scanner input = new Scanner(System.in);
         final int DAYS_TO_DELETE = getDaysToDelete(input);
-        final String path = getPathToDirectory(input);
-        final Path PATH_TO_DESKTOP = Paths.get(path);
+        final Path PATH_TO_DESKTOP = getPathToDirectory(input);
         LocalDate todayDate = LocalDate.now();
 
         Map<String, LocalDate> deletableFiles = streamDeletableFiles(PATH_TO_DESKTOP);
@@ -119,11 +118,12 @@ public class Main {
      * Receives the path to the directory where files will be collected for deletion.
      * The file should be in a Unix-like format. Ex: '/path/to/directory'.
      * @param input : {@link Scanner}
-     * @return {@link String}
+     * @return {@link Path}
      */
-    public static String getPathToDirectory(Scanner input) {
+    public static Path getPathToDirectory(Scanner input) {
         System.out.print("\tOkay, Where's your Desktop located (/path/to/desktop): ");
-        return input.next();
+        String path = input.next();
+        return Paths.get(path);
     }
 
     /**
