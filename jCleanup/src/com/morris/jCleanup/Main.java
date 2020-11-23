@@ -14,10 +14,8 @@ public class Main {
     public static void main(String[] args) {
         printIntroduction();
         Scanner input = new Scanner(System.in);
-        System.out.print("\tHow far should we go back, in days: ");
-        final int DAYS_TO_DELETE = input.nextInt();
-        System.out.print("\tOkay, Where's your Desktop located (/path/to/desktop): ");
-        final String path = input.next();
+        final int DAYS_TO_DELETE = getDaysToDelete(input);
+        final String path = getPathToDirectory(input);
         final Path PATH_TO_DESKTOP = Paths.get(path);
         LocalDate todayDate = LocalDate.now();
 
@@ -76,8 +74,8 @@ public class Main {
             start = start + 1;
         }
         int year = Integer.parseInt(formattedCreationTimeDate.substring(0, 4));
-        int month = Integer.parseInt(formattedCreationTimeDate.substring(5,7));
-        int day = Integer.parseInt(formattedCreationTimeDate.substring(8,10));
+        int month = Integer.parseInt(formattedCreationTimeDate.substring(5, 7));
+        int day = Integer.parseInt(formattedCreationTimeDate.substring(8, 10));
         return LocalDate.of(year, month, day);
     }
 
@@ -103,6 +101,29 @@ public class Main {
             }
         }
         return validDeletableFiles;
+    }
+
+    /**
+     * Receives the number of days user would like to go adjust today's date. If user
+     * submits '5' and today's date is 2020/11/25, then the date will be adjusted to
+     * 2020/11/20.
+     * @param input : {@link Scanner}
+     * @return : int
+     */
+    public static int getDaysToDelete(Scanner input) {
+        System.out.print("\tHow far should we go back, in days: ");
+        return input.nextInt();
+    }
+
+    /**
+     * Receives the path to the directory where files will be collected for deletion.
+     * The file should be in a Unix-like format. Ex: '/path/to/directory'.
+     * @param input : {@link Scanner}
+     * @return {@link String}
+     */
+    public static String getPathToDirectory(Scanner input) {
+        System.out.print("\tOkay, Where's your Desktop located (/path/to/desktop): ");
+        return input.next();
     }
 
     /**
