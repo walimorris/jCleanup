@@ -19,9 +19,9 @@ public class Main {
         printIntroduction();
         Scanner input = new Scanner(System.in);
         final int DAYS_TO_DELETE = getDaysToDelete(input);
-        final Path PATH_TO_DESKTOP = getPathToDirectory(input);
+        final Path PATH_TO_DIRECTORY = getPathToDirectory(input);
         LocalDate todayDate = LocalDate.now();
-        Map<String, LocalDate> deletableFiles = streamDeletableFiles(PATH_TO_DESKTOP);
+        Map<String, LocalDate> deletableFiles = streamDeletableFiles(PATH_TO_DIRECTORY);
         Map<String, LocalDate> validDeletableFiles = validateDeletableFiles(deletableFiles, DAYS_TO_DELETE, todayDate);
         boolean continueProcess = confirmFileDeletion(input, validDeletableFiles);
         if ( continueProcess ) {
@@ -39,13 +39,13 @@ public class Main {
      * and value: formatted date of deletable file. File is of type {@link String} and the
      * file's date is of type {@link LocalDate}.
      *
-     * @param pathToDesktop : Path to user's Desktop Directory (/path/to/desktop).
+     * @param pathToDirectory : Path to user's Desktop Directory (/path/to/desktop).
      * @return {@link Map}
      * @author Wali Morris<walimmorris@gmail.com>
      */
-    public static Map<String, LocalDate> streamDeletableFiles(Path pathToDesktop) {
+    public static Map<String, LocalDate> streamDeletableFiles(Path pathToDirectory) {
         Map<String, LocalDate> deletableFiles = new HashMap<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(pathToDesktop)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(pathToDirectory)) {
             for (Path file : stream) {
                 BasicFileAttributes fileAttributes = Files.readAttributes(file, BasicFileAttributes.class);
                 if (!fileAttributes.isDirectory()) {
@@ -180,7 +180,7 @@ public class Main {
         final String introduction =
 
                 "\n\tWelcome to jCleanup, a friendly Java / Linux-y way to quickly clean up\n" +
-                        "\tyour Desktop of old and un-used files. File are cleaned up based on your\n" +
+                        "\tyour Directories of old and un-used files. Files are cleaned up based on your\n" +
                         "\trequirements. If you would like files older than 5 days from today's date\n" +
                         "\tto disappear just choose 5. Easy enough right? If you find this automation\n" +
                         "\tprogram useful, give it a like and tell your friends.\n" +
