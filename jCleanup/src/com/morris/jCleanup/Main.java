@@ -1,11 +1,11 @@
 package com.morris.jCleanup;
 
 import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.DirectoryIteratorException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
@@ -25,8 +25,7 @@ public class Main {
         Map<String, LocalDate> validDeletableFiles = validateDeletableFiles(deletableFiles, DAYS_TO_DELETE, todayDate);
         boolean continueProcess = confirmFileDeletion(input, validDeletableFiles);
         if ( continueProcess ) {
-            System.out.println("deleting files!");
-            // delete files
+            deleteValidatedFiles(validDeletableFiles);
         } else {
             System.exit(1);
         }
@@ -170,6 +169,22 @@ public class Main {
         }
         System.out.println("\n\tWARNING ALL REPORTED FILES WILL BE DELETED!");
         return continueProcess(input);
+    }
+
+    /**
+     * Deletes all validated deletable files.
+     * @param validDeletableFiles : {@link Map} containing file and its {@link LocalDate}.
+     * @author Wali Morris<walimmorris@gmail.com>
+     */
+    public static void deleteValidatedFiles(Map<String, LocalDate> validDeletableFiles) {
+        validDeletableFiles.keySet().forEach((key -> {
+            try {
+                Files.delete(Paths.get(key));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
+        System.out.println("\tPOOF! Files have been deleted.");
     }
 
     /**
