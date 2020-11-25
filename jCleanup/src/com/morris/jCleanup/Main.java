@@ -1,16 +1,13 @@
 package com.morris.jCleanup;
 
 import java.io.IOException;
-import java.nio.file.DirectoryIteratorException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -20,9 +17,7 @@ public class Main {
         Scanner input = new Scanner(System.in);
         final int DAYS_TO_DELETE = getDaysToDelete(input);
         final Path PATH_TO_DIRECTORY = getPathToDirectory(input);
-        LocalDate todayDate = LocalDate.now();
-        Map<String, LocalDate> deletableFiles = streamDeletableFiles(PATH_TO_DIRECTORY);
-        Map<String, LocalDate> validDeletableFiles = validateDeletableFiles(deletableFiles, DAYS_TO_DELETE, todayDate);
+        Map<String, LocalDate> validDeletableFiles = validateDeletableFiles(PATH_TO_DIRECTORY, DAYS_TO_DELETE);
         boolean continueProcess = confirmFileDeletion(input, validDeletableFiles);
         if ( continueProcess ) {
             deleteValidatedFiles(validDeletableFiles);
@@ -80,18 +75,19 @@ public class Main {
 
     /**
      * This method adjusts today's date to the date which all files that falls on or before the adjusted
-     * date should be deleted. Returns a {@link Map} containing the File and {@link LocalDate} of the
-     * file that falls before or on the adjusted date.
-     * @param deletableFiles : {@link Map} structure containing all files and their {@link LocalDate}
+     * date should be deleted. Receives a {@link Map} containing deletable files from the given directory
+     * and returns a validated {@link Map} containing the File and {@link LocalDate} of the
+     * files that falls before or on the adjusted date.
+     * @param pathToDirectory : path to directory where files will be deleted.
      * @param daysToDelete : Days to adjust today's date, the adjusted date determines which files are
      *                       validated for deletion.
-     * @param todayDate : Today's date.
      * @return : {@link Map} containing path to file and {@link LocalDate}.
      * @author Wali Morris<walimmorris@gmail.com>
      */
-    public static Map<String, LocalDate> validateDeletableFiles(Map<String, LocalDate> deletableFiles,
-                                                                int daysToDelete, LocalDate todayDate) {
+    public static Map<String, LocalDate> validateDeletableFiles(Path pathToDirectory, int daysToDelete) {
+        LocalDate todayDate = LocalDate.now();
         Map<String, LocalDate> validDeletableFiles = new HashMap<>();
+        Map<String, LocalDate> deletableFiles = streamDeletableFiles(pathToDirectory);
         LocalDate adjustedDate = todayDate.minus(Period.ofDays(daysToDelete));
         System.out.println("\tFiles on or after date ' " + adjustedDate.toString() + " ' will be deleted.");
         for ( String file : deletableFiles.keySet() ) {
@@ -151,7 +147,16 @@ public class Main {
     public static Path getPathToDirectory(Scanner input) {
         System.out.print("\tOkay, Where's your Desktop located (/path/to/desktop): ");
         String path = input.next();
-        return Paths.get(path);
+        Path directoryPath = Path.of(path);
+        while (!Files.isDirectory(directoryPath)) {
+            System.out.print("\tOops! This doesn't seem to be a valid Directory, try again[q/quit]: ");
+            path = input.next();
+            directoryPath = Path.of(path);
+            if (path.equals("q") || path.equals("Q")) {
+                System.exit(1);
+            }
+        }
+        return directoryPath;
     }
 
     /**
