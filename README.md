@@ -11,4 +11,5 @@ that easy a process.
 2. cd into scripts directory
 
 run `chmod +x jCleanup.sh`
+
 run `./jCleanup`
