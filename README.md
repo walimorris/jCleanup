@@ -10,6 +10,6 @@ that easy a process.
 1. Clone into home directory 
 2. cd into scripts directory
 
-run `chmod +x jCleanup.sh`
+3. run `chmod +x jCleanup.sh`
 
-run `./jCleanup`
+4. run `./jCleanup`
