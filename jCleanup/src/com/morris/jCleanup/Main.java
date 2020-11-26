@@ -108,7 +108,18 @@ public class Main {
      */
     public static int getDaysToDelete(Scanner input) {
         System.out.print("\tHow far should we go back, in days: ");
-        return input.nextInt();
+        int daysToDelete = 0;
+        boolean flag = false;
+        while (!flag) {
+            try {
+                daysToDelete = input.nextInt();
+                flag = true;
+            } catch (InputMismatchException e) {
+                System.out.print("\tOops! Invalid numeric value[0-365], try again: ");
+                input.next();
+            }
+        }
+        return daysToDelete;
     }
 
     /**
